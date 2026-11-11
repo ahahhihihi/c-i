@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { ensureTextures } from '../assets';
 import { audio } from '../audio';
+import { SIM_BODY } from '../sims';
 import { showModal, closeModal } from '../ui/modals';
 
 const W = 920, H = 520;
@@ -12,6 +13,7 @@ export class BattleScene extends Phaser.Scene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: { W: Phaser.Input.Keyboard.Key; A: Phaser.Input.Keyboard.Key; S: Phaser.Input.Keyboard.Key; D: Phaser.Input.Keyboard.Key };
 
+  private playerShadow!: Phaser.GameObjects.Ellipse;
   private enemies: Unit[] = [];
   private minions: Unit[] = [];
   private turret!: { sprite: Phaser.GameObjects.Rectangle; hp: number; maxHp: number };
@@ -54,10 +56,8 @@ export class BattleScene extends Phaser.Scene {
     bg.fillGradientStyle(0x0a0e19, 0x0a0e19, 0x0f1525, 0x0f1525, 1);
     bg.fillRect(0, 0, W, H);
 
-    // Lane with subtle gradient
-    const lane = this.add.graphics();
-    lane.fillGradientStyle(0x111827, 0x111827, 0x1f2937, 0x1f2937, 1);
-    lane.fillRoundedRect(20, 50, W - 40, H - 100, 8);
+    // Wood-plank lane
+    this.add.tileSprite(W / 2, H / 2, W - 40, H - 100, 'floor_wood').setAlpha(0.9);
 
     // Lane markers
     for (let y = 100; y < H - 50; y += 80) {
@@ -90,11 +90,11 @@ export class BattleScene extends Phaser.Scene {
   private buildPlayer(): void {
     this.player = this.physics.add.sprite(W / 2, H - 100, 'player');
     this.player.setCollideWorldBounds(true);
-    this.player.body!.setSize(16, 16).setOffset(8, 32);
+    this.player.body!.setSize(SIM_BODY.w, SIM_BODY.h).setOffset(SIM_BODY.ox, SIM_BODY.oy);
     this.player.setDepth(10);
 
     // Shadow
-    this.add.ellipse(W / 2, H - 78, 24, 10, 0x000000, 0.3).setDepth(9);
+    this.playerShadow = this.add.ellipse(W / 2, H - 72, 26, 10, 0x000000, 0.3).setDepth(9);
   }
 
   private buildTurret(): void {
@@ -320,6 +320,7 @@ export class BattleScene extends Phaser.Scene {
     if (this.cursors.down.isDown || this.wasd.S.isDown) vy = 1;
 
     this.player.setVelocity(vx * 200, vy * 200);
+    this.playerShadow.setPosition(this.player.x, this.player.y + 28);
 
     // Enemy AI
     for (const e of this.enemies) {

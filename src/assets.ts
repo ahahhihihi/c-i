@@ -2,20 +2,22 @@
  * Improved procedural sprite generation - Sims-style characters, arcade cabinets
  */
 import Phaser from 'phaser';
+import { makeSim, makePlumbob, makeWoodFloor, makePlant, type SimLook } from './sims';
 
 export function ensureTextures(scene: Phaser.Scene): void {
-  // Player - Sims style
-  if (!scene.textures.exists('player')) makePlayer(scene);
-
-  // NPCs - varied appearances
-  const npcStyles = [
-    { key: 'npc_warm', skinTone: 0xf5d0c5, hairColor: 0x4a3728, shirtColor: 0xf6b94b },
-    { key: 'npc_cool', skinTone: 0xe8beac, hairColor: 0x1a1a1a, shirtColor: 0x42c2ff },
-    { key: 'npc_violet', skinTone: 0xd4a574, hairColor: 0x8b4513, shirtColor: 0xa87ffb },
-    { key: 'npc_gold', skinTone: 0xf5d0c5, hairColor: 0xdaa520, shirtColor: 0x22c55e },
-  ];
-  for (const style of npcStyles) {
-    if (!scene.textures.exists(style.key)) makeNpc(scene, style.key, style.skinTone, style.hairColor, style.shirtColor);
+  // Sims-style characters
+  makePlumbob(scene);
+  makeWoodFloor(scene);
+  makePlant(scene);
+  const looks: Record<string, SimLook> = {
+    player:     { skin: 0xf0c9a8, hair: 0x5a3a22, hairStyle: 'short', top: 0x2f80ed, bottom: 0x3b4a6b, eye: 0x3a7bd5 },
+    npc_warm:   { skin: 0xe9b896, hair: 0x2a1c14, hairStyle: 'long',  top: 0xf2a33a, bottom: 0x4a3b52, eye: 0x6b4423 },
+    npc_cool:   { skin: 0xc68e66, hair: 0x15151a, hairStyle: 'short', top: 0x27b5e8, bottom: 0x2d3748, eye: 0x2a2a2a },
+    npc_violet: { skin: 0x8d5a3b, hair: 0x3b1f4d, hairStyle: 'bun',   top: 0x9b6bf2, bottom: 0x3a3556, eye: 0x4b2a1a },
+    npc_gold:   { skin: 0xf6d5bd, hair: 0xe0a82e, hairStyle: 'curly', top: 0x2fbf71, bottom: 0x364152, eye: 0x2f9e6e },
+  };
+  for (const [key, look] of Object.entries(looks)) {
+    if (!scene.textures.exists(key)) makeSim(scene, key, look);
   }
 
   // Arcade cabinets - detailed
@@ -33,143 +35,6 @@ export function ensureTextures(scene: Phaser.Scene): void {
 
   // Floor tiles
   if (!scene.textures.exists('floor_tile')) makeFloorTile(scene);
-}
-
-function makePlayer(scene: Phaser.Scene): void {
-  const g = scene.add.graphics();
-  const w = 32, h = 48;
-
-  // Shadow
-  g.fillStyle(0x000000, 0.3);
-  g.fillEllipse(w / 2, h - 2, 20, 8);
-
-  // Legs
-  g.fillStyle(0x3b5998, 1); // Blue jeans
-  g.fillRoundedRect(8, 30, 7, 14, 2);
-  g.fillRoundedRect(17, 30, 7, 14, 2);
-
-  // Shoes
-  g.fillStyle(0x2d2d2d, 1);
-  g.fillRoundedRect(7, 42, 9, 4, 1);
-  g.fillRoundedRect(16, 42, 9, 4, 1);
-
-  // Body/torso
-  g.fillStyle(0x2563eb, 1); // Blue shirt
-  g.fillRoundedRect(6, 18, 20, 16, 3);
-
-  // Arms
-  g.fillStyle(0xf5d0c5, 1); // Skin
-  g.fillRoundedRect(2, 20, 5, 12, 2); // Left arm
-  g.fillRoundedRect(25, 20, 5, 12, 2); // Right arm
-
-  // Hands
-  g.fillCircle(4, 33, 3);
-  g.fillCircle(28, 33, 3);
-
-  // Neck
-  g.fillStyle(0xf5d0c5, 1);
-  g.fillRect(13, 14, 6, 5);
-
-  // Head
-  g.fillStyle(0xf5d0c5, 1);
-  g.fillCircle(16, 10, 9);
-
-  // Hair
-  g.fillStyle(0x4a3728, 1);
-  g.fillRoundedRect(8, 2, 16, 10, 4);
-
-  // Eyes
-  g.fillStyle(0x1a1a1a, 1);
-  g.fillCircle(13, 9, 2);
-  g.fillCircle(19, 9, 2);
-
-  // Eye highlights
-  g.fillStyle(0xffffff, 1);
-  g.fillCircle(13.5, 8.5, 0.8);
-  g.fillCircle(19.5, 8.5, 0.8);
-
-  // Smile
-  g.lineStyle(1, 0xcc6666);
-  g.beginPath();
-  g.arc(16, 12, 3, 0.2, Math.PI - 0.2);
-  g.strokePath();
-
-  g.generateTexture('player', w, h);
-  g.destroy();
-}
-
-function makeNpc(scene: Phaser.Scene, key: string, skinTone: number, hairColor: number, shirtColor: number): void {
-  const g = scene.add.graphics();
-  const w = 36, h = 52;
-
-  // Shadow
-  g.fillStyle(0x000000, 0.25);
-  g.fillEllipse(w / 2, h - 2, 22, 8);
-
-  // Legs
-  g.fillStyle(0x2d3748, 1);
-  g.fillRoundedRect(9, 34, 8, 14, 2);
-  g.fillRoundedRect(19, 34, 8, 14, 2);
-
-  // Shoes
-  g.fillStyle(0x1a1a1a, 1);
-  g.fillRoundedRect(8, 46, 10, 4, 1);
-  g.fillRoundedRect(18, 46, 10, 4, 1);
-
-  // Body
-  g.fillStyle(shirtColor, 1);
-  g.fillRoundedRect(6, 20, 24, 18, 4);
-
-  // Arms
-  g.fillStyle(skinTone, 1);
-  g.fillRoundedRect(2, 22, 5, 14, 2);
-  g.fillRoundedRect(29, 22, 5, 14, 2);
-
-  // Hands
-  g.fillCircle(4, 37, 3);
-  g.fillCircle(32, 37, 3);
-
-  // Neck
-  g.fillRect(15, 16, 6, 5);
-
-  // Head
-  g.fillCircle(18, 10, 10);
-
-  // Hair
-  g.fillStyle(hairColor, 1);
-  g.fillRoundedRect(8, 1, 20, 12, 5);
-
-  // Sides of hair
-  g.fillRect(7, 8, 4, 8);
-  g.fillRect(25, 8, 4, 8);
-
-  // Eyes
-  g.fillStyle(0x1a1a1a, 1);
-  g.fillCircle(14, 10, 2.5);
-  g.fillCircle(22, 10, 2.5);
-
-  // Eye whites
-  g.fillStyle(0xffffff, 1);
-  g.fillCircle(14.5, 9.5, 1);
-  g.fillCircle(22.5, 9.5, 1);
-
-  // Eyebrows
-  g.lineStyle(1.5, hairColor);
-  g.lineBetween(11, 6, 17, 7);
-  g.lineBetween(19, 7, 25, 6);
-
-  // Nose
-  g.fillStyle(0xd4a574, 1);
-  g.fillCircle(18, 13, 1.5);
-
-  // Smile
-  g.lineStyle(1.5, 0xcc7777);
-  g.beginPath();
-  g.arc(18, 14, 4, 0.3, Math.PI - 0.3);
-  g.strokePath();
-
-  g.generateTexture(key, w, h);
-  g.destroy();
 }
 
 function makeCabinet(scene: Phaser.Scene, key: string, primary: number, secondary: number, accent: number): void {

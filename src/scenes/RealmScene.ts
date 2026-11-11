@@ -1,11 +1,17 @@
 import Phaser from 'phaser';
 import { ensureTextures } from '../assets';
 import { audio } from '../audio';
+import { SIM_BODY } from '../sims';
 import { showModal, closeModal } from '../ui/modals';
 
 const W = 920, H = 520;
 
-type Shard = { sprite: Phaser.GameObjects.Sprite; collected: boolean };
+function shadeDark(c: number): number {
+  const k = Phaser.Display.Color.IntegerToColor(c);
+  return Phaser.Display.Color.GetColor(k.red * 0.6, k.green * 0.6, k.blue * 0.6);
+}
+
+type Shard = { gfx: Phaser.GameObjects.Graphics; glow: Phaser.GameObjects.Arc; x: number; y: number; collected: boolean };
 type Enemy = { sprite: Phaser.Physics.Arcade.Sprite; hp: number };
 
 export class RealmScene extends Phaser.Scene {
@@ -13,6 +19,7 @@ export class RealmScene extends Phaser.Scene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: { W: Phaser.Input.Keyboard.Key; A: Phaser.Input.Keyboard.Key; S: Phaser.Input.Keyboard.Key; D: Phaser.Input.Keyboard.Key };
 
+  private playerShadow!: Phaser.GameObjects.Ellipse;
   private shards: Shard[] = [];
   private shardsCollected = 0;
   private guardian!: Enemy;
@@ -99,100 +106,56 @@ export class RealmScene extends Phaser.Scene {
   private buildPlayer(): void {
     this.player = this.physics.add.sprite(100, H - 120, 'player');
     this.player.setCollideWorldBounds(true);
-    this.player.body!.setSize(16, 16).setOffset(8, 32);
+    this.player.body!.setSize(SIM_BODY.w, SIM_BODY.h).setOffset(SIM_BODY.ox, SIM_BODY.oy);
     this.player.setDepth(10);
 
     // Player shadow
-    this.add.ellipse(100, H - 98, 24, 10, 0x000000, 0.3).setDepth(9);
+    this.playerShadow = this.add.ellipse(100, H - 92, 26, 10, 0x000000, 0.3).setDepth(9);
   }
 
   private buildShards(): void {
-    const positions = [
-      { x: 250, y: 150 },
-      { x: 600, y: 200 },
-      { x: 450, y: 350 },
-    ];
-
+    this.shards = [];
+    const positions = [{ x: 250, y: 150 }, { x: 600, y: 200 }, { x: 450, y: 350 }];
     const colors = [0x42c2ff, 0x22c55e, 0xf6b94b];
 
-    for (let i = 0; i < positions.length; i++) {
-      const pos = positions[i];
+    positions.forEach((pos, i) => {
       const color = colors[i];
+      // Drawn around the origin so tweening y moves it relative to its home
+      const gfx = this.add.graphics({ x: pos.x, y: pos.y }).setDepth(5);
+      gfx.fillStyle(color, 1).fillTriangle(0, -16, 10, 0, -10, 0);
+      gfx.fillStyle(shadeDark(color), 1).fillTriangle(0, 16, 10, 0, -10, 0);
+      gfx.fillStyle(0xffffff, 0.55).fillTriangle(-1, -12, -6, -1, -1, -2);
 
-      // Create shard shape
-      const shard = this.add.graphics();
-      shard.fillStyle(color, 1);
-      shard.beginPath();
-      shard.moveTo(pos.x, pos.y - 15);
-      shard.lineTo(pos.x + 10, pos.y);
-      shard.lineTo(pos.x, pos.y + 15);
-      shard.lineTo(pos.x - 10, pos.y);
-      shard.closePath();
-      shard.fillPath();
-
-      // Inner glow
-      shard.fillStyle(0xffffff, 0.4);
-      shard.beginPath();
-      shard.moveTo(pos.x, pos.y - 8);
-      shard.lineTo(pos.x + 5, pos.y);
-      shard.lineTo(pos.x, pos.y + 8);
-      shard.lineTo(pos.x - 5, pos.y);
-      shard.closePath();
-      shard.fillPath();
-
-      // Outer glow
-      const glow = this.add.circle(pos.x, pos.y, 25, color, 0.2);
+      const glow = this.add.circle(pos.x, pos.y, 25, color, 0.2).setDepth(4);
       this.tweens.add({ targets: glow, alpha: 0.4, scale: 1.3, duration: 1000, yoyo: true, repeat: -1 });
+      this.tweens.add({ targets: gfx, y: pos.y - 6, duration: 1300, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
 
-      // Floating animation
-      this.tweens.add({
-        targets: shard,
-        y: -5,
-        duration: 1500,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.inOut',
-      });
-
-      this.shards.push({ sprite: this.add.sprite(pos.x, pos.y, '__DEFAULT').setVisible(false), collected: false });
-      (this.shards[i] as any).graphics = shard;
-    }
+      this.shards.push({ gfx, glow, x: pos.x, y: pos.y, collected: false });
+    });
   }
 
   private buildGuardian(): void {
-    // Create guardian boss sprite
-    const guardianGfx = this.add.graphics();
-    guardianGfx.fillStyle(0x6b21a8, 1);
-
-    // Body
-    guardianGfx.fillCircle(W / 2, 100, 40);
-
-    // Eyes
-    guardianGfx.fillStyle(0xffffff, 1);
-    guardianGfx.fillCircle(W / 2 - 15, 90, 8);
-    guardianGfx.fillCircle(W / 2 + 15, 90, 8);
-
-    // Pupils
-    guardianGfx.fillStyle(0x1a1a1a, 1);
-    guardianGfx.fillCircle(W / 2 - 15, 90, 4);
-    guardianGfx.fillCircle(W / 2 + 15, 90, 4);
-
-    // Crown/horns
-    guardianGfx.fillStyle(0x4c1d95, 1);
-    guardianGfx.fillTriangle(W / 2 - 30, 70, W / 2 - 20, 50, W / 2 - 10, 70);
-    guardianGfx.fillTriangle(W / 2 + 30, 70, W / 2 + 20, 50, W / 2 + 10, 70);
-
-    // Glow effect
-    const guardianGlow = this.add.circle(W / 2, 100, 50, 0x6b21a8, 0.2);
-    this.tweens.add({ targets: guardianGlow, alpha: 0.4, scale: 1.2, duration: 1500, yoyo: true, repeat: -1 });
-
-    const sprite = this.physics.add.sprite(W / 2, 100, '__DEFAULT');
-    sprite.setAlpha(0.3);
-    sprite.setVelocity(0, 0);
-    sprite.setVisible(false);
-    (this as any).guardianGfx = guardianGfx;
-
+    if (!this.textures.exists('guardian')) {
+      const g = this.add.graphics();
+      g.fillStyle(0x000000, 0.25).fillEllipse(50, 92, 70, 14);
+      g.fillStyle(0x4c1d95, 1).fillTriangle(22, 34, 30, 4, 42, 30);
+      g.fillStyle(0x4c1d95, 1).fillTriangle(78, 34, 70, 4, 58, 30);
+      g.fillStyle(0x6b21a8, 1).fillRoundedRect(20, 40, 60, 50, 22);
+      g.fillStyle(0x8b3fd0, 0.8).fillEllipse(38, 52, 22, 16);
+      g.fillStyle(0x6b21a8, 1).fillCircle(50, 36, 26);
+      g.fillStyle(0x8b3fd0, 0.8).fillEllipse(42, 28, 20, 12);
+      for (const ex of [40, 60]) {
+        g.fillStyle(0xfff2a8, 1).fillEllipse(ex, 36, 12, 14);
+        g.fillStyle(0x1a1a1a, 1).fillCircle(ex, 37, 3.5);
+        g.fillStyle(0xffffff, 1).fillCircle(ex - 1, 35, 1.3);
+      }
+      g.lineStyle(2, 0x2e1065, 1).lineBetween(38, 50, 62, 50);
+      g.generateTexture('guardian', 100, 100);
+      g.destroy();
+    }
+    const sprite = this.physics.add.sprite(W / 2, 100, 'guardian').setAlpha(0.3).setDepth(8);
     this.guardian = { sprite, hp: 150 };
+    this.tweens.add({ targets: sprite, scaleY: 1.04, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
   }
 
   private buildInput(): void {
@@ -233,20 +196,15 @@ export class RealmScene extends Phaser.Scene {
     // Check shards
     for (const shard of this.shards) {
       if (shard.collected) continue;
-      const shardX = shard.sprite.x;
-      const shardY = shard.sprite.y;
-      const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, shardX, shardY);
-      if (dist < 40) {
+      const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, shard.x, shard.y);
+      if (dist < 50) {
         shard.collected = true;
-        shard.sprite.destroy();
-        (shard as any).graphics?.destroy();
+        shard.gfx.destroy();
+        shard.glow.destroy();
         audio.sfx('collect');
         this.shardsCollected++;
         this.shardText.setText(`SHARDS: ${this.shardsCollected} / 3`);
-
-        if (this.shardsCollected >= 3) {
-          this.activateGuardian();
-        }
+        if (this.shardsCollected >= 3) this.activateGuardian();
         return;
       }
     }
@@ -278,27 +236,8 @@ export class RealmScene extends Phaser.Scene {
       audio.sfx('hit');
       this.guardian.hp -= 25;
 
-      // Flash effect
-      const guardianGfx = (this as any).guardianGfx;
-      if (guardianGfx) {
-        guardianGfx.clear();
-        guardianGfx.fillStyle(0xffffff, 1);
-        guardianGfx.fillCircle(W / 2, 100, 40);
-        this.time.delayedCall(100, () => {
-          guardianGfx.clear();
-          guardianGfx.fillStyle(0x6b21a8, 1);
-          guardianGfx.fillCircle(W / 2, 100, 40);
-          guardianGfx.fillStyle(0xffffff, 1);
-          guardianGfx.fillCircle(W / 2 - 15, 90, 8);
-          guardianGfx.fillCircle(W / 2 + 15, 90, 8);
-          guardianGfx.fillStyle(0x1a1a1a, 1);
-          guardianGfx.fillCircle(W / 2 - 15, 90, 4);
-          guardianGfx.fillCircle(W / 2 + 15, 90, 4);
-          guardianGfx.fillStyle(0x4c1d95, 1);
-          guardianGfx.fillTriangle(W / 2 - 30, 70, W / 2 - 20, 50, W / 2 - 10, 70);
-          guardianGfx.fillTriangle(W / 2 + 30, 70, W / 2 + 20, 50, W / 2 + 10, 70);
-        });
-      }
+      this.guardian.sprite.setTintFill(0xffffff);
+      this.time.delayedCall(100, () => this.guardian.sprite.clearTint());
 
       if (this.guardian.hp <= 0) {
         this.victory();
@@ -364,6 +303,7 @@ export class RealmScene extends Phaser.Scene {
     if (this.cursors.up.isDown || this.wasd.W.isDown) vy = -1;
     if (this.cursors.down.isDown || this.wasd.S.isDown) vy = 1;
 
+    this.playerShadow.setPosition(this.player.x, this.player.y + 28);
     const speed = 150;
     this.player.setVelocity(vx * speed, vy * speed);
 

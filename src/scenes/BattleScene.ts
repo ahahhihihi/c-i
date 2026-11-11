@@ -49,33 +49,77 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private buildArena(): void {
-    // Lane
-    this.add.rectangle(W / 2, H / 2, W - 40, H - 100, 0x111827);
+    // Gradient background
+    const bg = this.add.graphics();
+    bg.fillGradientStyle(0x0a0e19, 0x0a0e19, 0x0f1525, 0x0f1525, 1);
+    bg.fillRect(0, 0, W, H);
+
+    // Lane with subtle gradient
+    const lane = this.add.graphics();
+    lane.fillGradientStyle(0x111827, 0x111827, 0x1f2937, 0x1f2937, 1);
+    lane.fillRoundedRect(20, 50, W - 40, H - 100, 8);
 
     // Lane markers
     for (let y = 100; y < H - 50; y += 80) {
       this.add.rectangle(W / 2, y, 200, 2, 0x1f2937);
     }
 
-    // Top spawn area
+    // Side decorations
+    this.add.rectangle(10, H / 2, 8, H - 80, 0x1f2937);
+    this.add.rectangle(W - 10, H / 2, 8, H - 80, 0x1f2937);
+
+    // Top spawn area with glow
+    const spawnGlow = this.add.graphics();
+    spawnGlow.fillStyle(0xef4444, 0.1);
+    spawnGlow.fillRoundedRect(W / 2 - 150, 40, 300, 50, 4);
+
     this.add.rectangle(W / 2, 60, W - 100, 40, 0x1f2937);
+    this.add.rectangle(W / 2, 60, W - 100, 40, 0xef4444, 0.1);
     this.add.text(W / 2, 60, 'ENEMY SPAWN', { fontFamily: 'monospace', fontSize: '9px', color: '#ef4444' }).setOrigin(0.5);
 
-    // Bottom player area
+    // Bottom player area with glow
+    const baseGlow = this.add.graphics();
+    baseGlow.fillStyle(0x22c55e, 0.1);
+    baseGlow.fillRoundedRect(W / 2 - 150, H - 70, 300, 50, 4);
+
     this.add.rectangle(W / 2, H - 50, W - 100, 40, 0x1f2937);
+    this.add.rectangle(W / 2, H - 50, W - 100, 40, 0x22c55e, 0.1);
     this.add.text(W / 2, H - 50, 'PLAYER BASE', { fontFamily: 'monospace', fontSize: '9px', color: '#22c55e' }).setOrigin(0.5);
   }
 
   private buildPlayer(): void {
-    this.player = this.physics.add.sprite(W / 2, H - 100, 'player_idle');
+    this.player = this.physics.add.sprite(W / 2, H - 100, 'player');
     this.player.setCollideWorldBounds(true);
-    this.player.body!.setSize(14, 14);
+    this.player.body!.setSize(16, 16).setOffset(8, 32);
     this.player.setDepth(10);
+
+    // Shadow
+    this.add.ellipse(W / 2, H - 78, 24, 10, 0x000000, 0.3).setDepth(9);
   }
 
   private buildTurret(): void {
-    const turretSprite = this.add.rectangle(W / 2, 100, 60, 80, 0x374151);
+    // Turret base
+    const base = this.add.graphics();
+    base.fillStyle(0x1f2937, 1);
+    base.fillRoundedRect(W / 2 - 40, 100, 80, 10, 3);
+
+    // Turret body
+    const turretSprite = this.add.rectangle(W / 2, 80, 50, 60, 0x374151);
     turretSprite.setStrokeStyle(3, 0xef4444);
+
+    // Turret top
+    const top = this.add.graphics();
+    top.fillStyle(0xef4444, 1);
+    top.fillCircle(W / 2, 55, 12);
+    top.fillStyle(0xff6659, 0.5);
+    top.fillCircle(W / 2 - 3, 53, 4);
+
+    // Glow effect
+    const glow = this.add.graphics();
+    glow.fillStyle(0xef4444, 0.15);
+    glow.fillCircle(W / 2, 80, 50);
+    this.tweens.add({ targets: glow, alpha: 0.25, duration: 1500, yoyo: true, repeat: -1 });
+
     this.turret = { sprite: turretSprite, hp: 200, maxHp: 200 };
     this.turretHpBar = this.add.graphics();
     this.updateTurretHp();
@@ -126,8 +170,9 @@ export class BattleScene extends Phaser.Scene {
     // Enemy minions from top
     for (let i = 0; i < 2; i++) {
       const x = W / 2 + (i === 0 ? -40 : 40);
-      const sprite = this.physics.add.sprite(x, 80, 'player_idle');
+      const sprite = this.physics.add.sprite(x, 80, 'player');
       sprite.setTint(0xef4444);
+      sprite.setBodySize(16, 16);
       sprite.setVelocityY(60);
       this.minions.push({ sprite, hp: 30, maxHp: 30, team: 'enemy', atkCd: 0 });
     }
@@ -136,9 +181,10 @@ export class BattleScene extends Phaser.Scene {
   private spawnEnemy(): void {
     if (this.over || this.enemies.length >= 2) return;
 
-    const sprite = this.physics.add.sprite(W / 2, 80, 'player_idle');
+    const sprite = this.physics.add.sprite(W / 2, 80, 'player');
     sprite.setTint(0xef4444);
-    sprite.setScale(1.2);
+    sprite.setScale(1.3);
+    sprite.setBodySize(16, 16);
     this.enemies.push({ sprite, hp: 80, maxHp: 80, team: 'enemy', atkCd: 0 });
   }
 

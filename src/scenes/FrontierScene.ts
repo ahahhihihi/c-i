@@ -54,38 +54,56 @@ export class FrontierScene extends Phaser.Scene {
   }
 
   private buildUI(): void {
-    // Background
-    this.add.rectangle(W / 2, H / 2, W, H, 0x111827);
+    // Gradient background - wilderness
+    const bg = this.add.graphics();
+    bg.fillGradientStyle(0x0d1117, 0x0d1117, 0x151f2e, 0x151f2e, 1);
+    bg.fillRect(0, 0, W, H);
 
     // Resource panel
-    this.add.rectangle(150, 60, 280, 80, 0x1f2937);
-    this.add.text(20, 20, 'RESOURCES', { fontFamily: 'monospace', fontSize: '10px', color: '#8b8d9a' });
+    const resourcePanel = this.add.graphics();
+    resourcePanel.fillStyle(0x1f2937, 1);
+    resourcePanel.fillRoundedRect(10, 10, 290, 90, 6);
+    resourcePanel.lineStyle(1, 0x22c55e, 0.3);
+    resourcePanel.strokeRoundedRect(10, 10, 290, 90, 6);
+
+    this.add.text(20, 20, 'RESOURCES', { fontFamily: 'monospace', fontSize: '10px', color: '#22c55e' });
 
     this.resourceText = this.add.text(30, 40, '', {
       fontFamily: 'monospace', fontSize: '11px', color: '#ffd078', lineSpacing: 6,
     });
     this.updateResourceDisplay();
 
-    // Round info
-    this.add.rectangle(W - 120, 60, 200, 80, 0x1f2937);
-    this.roundText = this.add.text(W - 200, 30, 'ROUND 1 / 3', {
+    // Round info panel
+    const roundPanel = this.add.graphics();
+    roundPanel.fillStyle(0x1f2937, 1);
+    roundPanel.fillRoundedRect(W - 220, 10, 210, 90, 6);
+    roundPanel.lineStyle(1, 0xef4444, 0.3);
+    roundPanel.strokeRoundedRect(W - 220, 10, 210, 90, 6);
+
+    this.roundText = this.add.text(W - 200, 20, 'ROUND 1 / 3', {
       fontFamily: 'monospace', fontSize: '12px', color: '#ffd078',
     });
 
-    this.countdownText = this.add.text(W - 200, 55, 'NEXT RAID: 30s', {
+    this.countdownText = this.add.text(W - 200, 45, 'NEXT RAID: 30s', {
       fontFamily: 'monospace', fontSize: '11px', color: '#ef4444',
     });
 
-    this.statusText = this.add.text(W - 200, 80, 'Workers: 6 / 12', {
+    this.statusText = this.add.text(W - 200, 70, 'Workers: 6 / 12', {
       fontFamily: 'monospace', fontSize: '10px', color: '#8b8d9a',
     });
 
-    // Settlement visualization
-    this.add.rectangle(W / 2, H / 2 + 60, 600, 200, 0x1a1f2e);
+    // Settlement visualization - grass/ground
+    const ground = this.add.graphics();
+    ground.fillGradientStyle(0x1a2e1a, 0x1a2e1a, 0x1f331a, 0x1f331a, 1);
+    ground.fillRoundedRect(W / 2 - 310, H / 2 - 50, 620, 220, 8);
+
+    // Settlement fence outline
+    ground.lineStyle(2, 0x5c4033, 0.6);
+    ground.strokeRoundedRect(W / 2 - 300, H / 2 - 40, 600, 200, 6);
 
     // Buildings area label
-    this.add.text(W / 2, H / 2 - 30, 'SETTLEMENT', {
-      fontFamily: 'monospace', fontSize: '10px', color: '#8b8d9a',
+    this.add.text(W / 2, H / 2 - 60, 'SETTLEMENT', {
+      fontFamily: 'monospace', fontSize: '10px', color: '#22c55e',
     }).setOrigin(0.5);
 
     this.renderBuildings();
@@ -225,11 +243,46 @@ export class FrontierScene extends Phaser.Scene {
   }
 
   private renderBuildings(): void {
-    // Clear old building sprites
     this.buildings.forEach(b => {
-      const color = b.type === 'farm' ? 0x22c55e : 0x60a5fa;
-      this.add.rectangle(b.x, b.y, 50, 40, color, 0.6);
-      this.add.text(b.x, b.y, b.type === 'farm' ? '🌾' : '🛡️', { fontSize: '16px' }).setOrigin(0.5);
+      const gfx = this.add.graphics();
+
+      if (b.type === 'farm') {
+        // Farm house
+        gfx.fillStyle(0x8b4513, 1);
+        gfx.fillRoundedRect(b.x - 25, b.y - 10, 50, 30, 3);
+
+        // Roof
+        gfx.fillStyle(0xa0522d, 1);
+        gfx.fillTriangle(b.x - 30, b.y - 10, b.x, b.y - 30, b.x + 30, b.y - 10);
+
+        // Door
+        gfx.fillStyle(0x5c4033, 1);
+        gfx.fillRect(b.x - 6, b.y + 5, 12, 15);
+
+        // Field crops
+        gfx.fillStyle(0x22c55e, 0.8);
+        for (let i = 0; i < 3; i++) {
+          gfx.fillRect(b.x - 20 + i * 15, b.y + 25, 10, 15);
+        }
+
+        this.add.text(b.x, b.y - 5, '🌾', { fontSize: '12px' }).setOrigin(0.5);
+      } else {
+        // Palisade wall
+        gfx.fillStyle(0x5c4033, 1);
+        gfx.fillRect(b.x - 25, b.y - 20, 8, 50);
+        gfx.fillRect(b.x - 10, b.y - 25, 8, 55);
+        gfx.fillRect(b.x + 5, b.y - 25, 8, 55);
+        gfx.fillRect(b.x + 20, b.y - 20, 8, 50);
+
+        // Pointed tops
+        gfx.fillStyle(0x4a3528, 1);
+        gfx.fillTriangle(b.x - 21, b.y - 20, b.x - 17, b.y - 30, b.x - 13, b.y - 20);
+        gfx.fillTriangle(b.x - 6, b.y - 25, b.x - 2, b.y - 35, b.x + 2, b.y - 25);
+        gfx.fillTriangle(b.x + 9, b.y - 25, b.x + 13, b.y - 35, b.x + 17, b.y - 25);
+        gfx.fillTriangle(b.x + 24, b.y - 20, b.x + 28, b.y - 30, b.x + 32, b.y - 20);
+
+        this.add.text(b.x, b.y - 10, '🛡️', { fontSize: '12px' }).setOrigin(0.5);
+      }
     });
   }
 

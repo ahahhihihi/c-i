@@ -43,19 +43,28 @@ export class RealmScene extends Phaser.Scene {
   }
 
   private buildWorld(): void {
-    // Dark realm background
-    this.add.rectangle(W / 2, H / 2, W, H, 0x0d1117);
+    // Gradient background - dark mystical realm
+    const bg = this.add.graphics();
+    bg.fillGradientStyle(0x0d0815, 0x0d0815, 0x140a20, 0x140a20, 1);
+    bg.fillRect(0, 0, W, H);
 
-    // Stone floor tiles
+    // Stone floor tiles with mystical pattern
     for (let x = 0; x < W; x += 60) {
       for (let y = 0; y < H; y += 60) {
-        const shade = Math.random() > 0.5 ? 0x1a1f2e : 0x141927;
-        this.add.rectangle(x + 30, y + 30, 56, 56, shade).setAlpha(0.7);
+        const shade = Math.random() > 0.5 ? 0x1a1525 : 0x14101f;
+        this.add.rectangle(x + 30, y + 30, 56, 56, shade).setAlpha(0.8);
+
+        // Occasional rune marks
+        if (Math.random() > 0.85) {
+          this.add.text(x + 30, y + 30, ['✦', '✧', '◈', '◇'][Math.floor(Math.random() * 4)], {
+            fontFamily: 'monospace', fontSize: '12px', color: '#a87ffb',
+          }).setOrigin(0.5).setAlpha(0.2);
+        }
       }
     }
 
-    // Atmospheric particles
-    for (let i = 0; i < 20; i++) {
+    // Atmospheric particles - mystical energy
+    for (let i = 0; i < 25; i++) {
       const p = this.add.circle(
         Math.random() * W,
         Math.random() * H,
@@ -77,16 +86,24 @@ export class RealmScene extends Phaser.Scene {
       });
     }
 
-    // Quest giver area
-    this.add.rectangle(100, H - 60, 80, 40, 0x1f2937);
+    // Quest giver area with mystical glow
+    const elderGlow = this.add.graphics();
+    elderGlow.fillStyle(0xa87ffb, 0.15);
+    elderGlow.fillCircle(100, H - 60, 50);
+
+    this.add.rectangle(100, H - 60, 80, 40, 0x1f1525);
+    this.add.rectangle(100, H - 60, 80, 40, 0xa87ffb, 0.1);
     this.add.text(100, H - 60, 'ELDER\nCHEN', { fontFamily: 'monospace', fontSize: '8px', color: '#a87ffb', align: 'center' }).setOrigin(0.5);
   }
 
   private buildPlayer(): void {
-    this.player = this.physics.add.sprite(100, H - 120, 'player_idle');
+    this.player = this.physics.add.sprite(100, H - 120, 'player');
     this.player.setCollideWorldBounds(true);
-    this.player.body!.setSize(14, 14);
+    this.player.body!.setSize(16, 16).setOffset(8, 32);
     this.player.setDepth(10);
+
+    // Player shadow
+    this.add.ellipse(100, H - 98, 24, 10, 0x000000, 0.3).setDepth(9);
   }
 
   private buildShards(): void {
@@ -100,25 +117,80 @@ export class RealmScene extends Phaser.Scene {
 
     for (let i = 0; i < positions.length; i++) {
       const pos = positions[i];
-      const sprite = this.add.sprite(pos.x, pos.y, 'player_idle');
-      sprite.setTint(colors[i]);
-      sprite.setScale(0.6);
-      sprite.setVisible(true);
+      const color = colors[i];
 
-      // Glow
-      const glow = this.add.circle(pos.x, pos.y, 20, colors[i], 0.2);
+      // Create shard shape
+      const shard = this.add.graphics();
+      shard.fillStyle(color, 1);
+      shard.beginPath();
+      shard.moveTo(pos.x, pos.y - 15);
+      shard.lineTo(pos.x + 10, pos.y);
+      shard.lineTo(pos.x, pos.y + 15);
+      shard.lineTo(pos.x - 10, pos.y);
+      shard.closePath();
+      shard.fillPath();
+
+      // Inner glow
+      shard.fillStyle(0xffffff, 0.4);
+      shard.beginPath();
+      shard.moveTo(pos.x, pos.y - 8);
+      shard.lineTo(pos.x + 5, pos.y);
+      shard.lineTo(pos.x, pos.y + 8);
+      shard.lineTo(pos.x - 5, pos.y);
+      shard.closePath();
+      shard.fillPath();
+
+      // Outer glow
+      const glow = this.add.circle(pos.x, pos.y, 25, color, 0.2);
       this.tweens.add({ targets: glow, alpha: 0.4, scale: 1.3, duration: 1000, yoyo: true, repeat: -1 });
 
-      this.shards.push({ sprite, collected: false });
+      // Floating animation
+      this.tweens.add({
+        targets: shard,
+        y: -5,
+        duration: 1500,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.inOut',
+      });
+
+      this.shards.push({ sprite: this.add.sprite(pos.x, pos.y, '__DEFAULT').setVisible(false), collected: false });
+      (this.shards[i] as any).graphics = shard;
     }
   }
 
   private buildGuardian(): void {
-    const sprite = this.physics.add.sprite(W / 2, 100, 'player_idle');
-    sprite.setTint(0x6b21a8);
-    sprite.setScale(2);
+    // Create guardian boss sprite
+    const guardianGfx = this.add.graphics();
+    guardianGfx.fillStyle(0x6b21a8, 1);
+
+    // Body
+    guardianGfx.fillCircle(W / 2, 100, 40);
+
+    // Eyes
+    guardianGfx.fillStyle(0xffffff, 1);
+    guardianGfx.fillCircle(W / 2 - 15, 90, 8);
+    guardianGfx.fillCircle(W / 2 + 15, 90, 8);
+
+    // Pupils
+    guardianGfx.fillStyle(0x1a1a1a, 1);
+    guardianGfx.fillCircle(W / 2 - 15, 90, 4);
+    guardianGfx.fillCircle(W / 2 + 15, 90, 4);
+
+    // Crown/horns
+    guardianGfx.fillStyle(0x4c1d95, 1);
+    guardianGfx.fillTriangle(W / 2 - 30, 70, W / 2 - 20, 50, W / 2 - 10, 70);
+    guardianGfx.fillTriangle(W / 2 + 30, 70, W / 2 + 20, 50, W / 2 + 10, 70);
+
+    // Glow effect
+    const guardianGlow = this.add.circle(W / 2, 100, 50, 0x6b21a8, 0.2);
+    this.tweens.add({ targets: guardianGlow, alpha: 0.4, scale: 1.2, duration: 1500, yoyo: true, repeat: -1 });
+
+    const sprite = this.physics.add.sprite(W / 2, 100, '__DEFAULT');
     sprite.setAlpha(0.3);
     sprite.setVelocity(0, 0);
+    sprite.setVisible(false);
+    (this as any).guardianGfx = guardianGfx;
 
     this.guardian = { sprite, hp: 150 };
   }
@@ -161,10 +233,13 @@ export class RealmScene extends Phaser.Scene {
     // Check shards
     for (const shard of this.shards) {
       if (shard.collected) continue;
-      const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, shard.sprite.x, shard.sprite.y);
+      const shardX = shard.sprite.x;
+      const shardY = shard.sprite.y;
+      const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, shardX, shardY);
       if (dist < 40) {
         shard.collected = true;
         shard.sprite.destroy();
+        (shard as any).graphics?.destroy();
         audio.sfx('collect');
         this.shardsCollected++;
         this.shardText.setText(`SHARDS: ${this.shardsCollected} / 3`);
@@ -203,9 +278,27 @@ export class RealmScene extends Phaser.Scene {
       audio.sfx('hit');
       this.guardian.hp -= 25;
 
-      // Flash
-      this.guardian.sprite.setTint(0xffffff);
-      this.time.delayedCall(100, () => this.guardian.sprite.setTint(0x6b21a8));
+      // Flash effect
+      const guardianGfx = (this as any).guardianGfx;
+      if (guardianGfx) {
+        guardianGfx.clear();
+        guardianGfx.fillStyle(0xffffff, 1);
+        guardianGfx.fillCircle(W / 2, 100, 40);
+        this.time.delayedCall(100, () => {
+          guardianGfx.clear();
+          guardianGfx.fillStyle(0x6b21a8, 1);
+          guardianGfx.fillCircle(W / 2, 100, 40);
+          guardianGfx.fillStyle(0xffffff, 1);
+          guardianGfx.fillCircle(W / 2 - 15, 90, 8);
+          guardianGfx.fillCircle(W / 2 + 15, 90, 8);
+          guardianGfx.fillStyle(0x1a1a1a, 1);
+          guardianGfx.fillCircle(W / 2 - 15, 90, 4);
+          guardianGfx.fillCircle(W / 2 + 15, 90, 4);
+          guardianGfx.fillStyle(0x4c1d95, 1);
+          guardianGfx.fillTriangle(W / 2 - 30, 70, W / 2 - 20, 50, W / 2 - 10, 70);
+          guardianGfx.fillTriangle(W / 2 + 30, 70, W / 2 + 20, 50, W / 2 + 10, 70);
+        });
+      }
 
       if (this.guardian.hp <= 0) {
         this.victory();

@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { ensureTextures } from '../assets';
 import { audio } from '../audio';
-import { SIM_BODY } from '../sims';
+import { fitToScreen } from '../view';
+import { TEX_SCALE, spawnSim } from '../sims';
 import { showModal, closeModal } from '../ui/modals';
 
 const W = 920, H = 520;
@@ -30,6 +31,7 @@ export class BattleScene extends Phaser.Scene {
   constructor() { super('Battle'); }
 
   create(): void {
+    fitToScreen(this);
     ensureTextures(this);
     audio.sfx('click');
     this.over = false;
@@ -57,7 +59,7 @@ export class BattleScene extends Phaser.Scene {
     bg.fillRect(0, 0, W, H);
 
     // Wood-plank lane
-    this.add.tileSprite(W / 2, H / 2, W - 40, H - 100, 'floor_wood').setAlpha(0.9);
+    this.add.tileSprite(W / 2, H / 2, W - 40, H - 100, 'floor_wood').setTileScale(1 / TEX_SCALE).setAlpha(0.9);
 
     // Lane markers
     for (let y = 100; y < H - 50; y += 80) {
@@ -75,7 +77,7 @@ export class BattleScene extends Phaser.Scene {
 
     this.add.rectangle(W / 2, 60, W - 100, 40, 0x1f2937);
     this.add.rectangle(W / 2, 60, W - 100, 40, 0xef4444, 0.1);
-    this.add.text(W / 2, 60, 'ENEMY SPAWN', { fontFamily: 'monospace', fontSize: '9px', color: '#ef4444' }).setOrigin(0.5);
+    this.add.text(W / 2, 60, 'ENEMY SPAWN', { fontFamily: 'monospace', fontSize: '11px', color: '#ef4444' }).setOrigin(0.5);
 
     // Bottom player area with glow
     const baseGlow = this.add.graphics();
@@ -84,13 +86,12 @@ export class BattleScene extends Phaser.Scene {
 
     this.add.rectangle(W / 2, H - 50, W - 100, 40, 0x1f2937);
     this.add.rectangle(W / 2, H - 50, W - 100, 40, 0x22c55e, 0.1);
-    this.add.text(W / 2, H - 50, 'PLAYER BASE', { fontFamily: 'monospace', fontSize: '9px', color: '#22c55e' }).setOrigin(0.5);
+    this.add.text(W / 2, H - 50, 'PLAYER BASE', { fontFamily: 'monospace', fontSize: '11px', color: '#22c55e' }).setOrigin(0.5);
   }
 
   private buildPlayer(): void {
-    this.player = this.physics.add.sprite(W / 2, H - 100, 'player');
+    this.player = spawnSim(this, W / 2, H - 100);
     this.player.setCollideWorldBounds(true);
-    this.player.body!.setSize(SIM_BODY.w, SIM_BODY.h).setOffset(SIM_BODY.ox, SIM_BODY.oy);
     this.player.setDepth(10);
 
     // Shadow
@@ -146,9 +147,9 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private buildHud(): void {
-    this.add.text(20, 20, 'BATTLE ARENA', { fontFamily: 'monospace', fontSize: '12px', color: '#ffd078' });
+    this.add.text(20, 20, 'BATTLE ARENA', { fontFamily: 'monospace', fontSize: '14px', color: '#ffd078' });
 
-    this.goldText = this.add.text(20, 40, 'GOLD: 0', { fontFamily: 'monospace', fontSize: '11px', color: '#ffd078' });
+    this.goldText = this.add.text(20, 40, 'GOLD: 0', { fontFamily: 'monospace', fontSize: '13px', color: '#ffd078' });
 
     // Cooldown bar
     this.cooldownBar = this.add.graphics();
@@ -156,7 +157,7 @@ export class BattleScene extends Phaser.Scene {
 
     // Controls hint
     this.add.text(W - 20, 20, 'WASD · SPACE attack · J special', {
-      fontFamily: 'monospace', fontSize: '9px', color: '#8b8d9a',
+      fontFamily: 'monospace', fontSize: '11px', color: '#8b8d9a',
     }).setOrigin(1, 0);
 
     // ESC to pause
@@ -170,9 +171,8 @@ export class BattleScene extends Phaser.Scene {
     // Enemy minions from top
     for (let i = 0; i < 2; i++) {
       const x = W / 2 + (i === 0 ? -40 : 40);
-      const sprite = this.physics.add.sprite(x, 80, 'player');
+      const sprite = spawnSim(this, x, 80);
       sprite.setTint(0xef4444);
-      sprite.setBodySize(16, 16);
       sprite.setVelocityY(60);
       this.minions.push({ sprite, hp: 30, maxHp: 30, team: 'enemy', atkCd: 0 });
     }
@@ -181,10 +181,9 @@ export class BattleScene extends Phaser.Scene {
   private spawnEnemy(): void {
     if (this.over || this.enemies.length >= 2) return;
 
-    const sprite = this.physics.add.sprite(W / 2, 80, 'player');
+    const sprite = spawnSim(this, W / 2, 80);
     sprite.setTint(0xef4444);
-    sprite.setScale(1.3);
-    sprite.setBodySize(16, 16);
+    sprite.setScale(1.3 / TEX_SCALE);
     this.enemies.push({ sprite, hp: 80, maxHp: 80, team: 'enemy', atkCd: 0 });
   }
 

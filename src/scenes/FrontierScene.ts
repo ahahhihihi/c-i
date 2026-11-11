@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { audio } from '../audio';
+import { fitToScreen } from '../view';
 import { showModal, closeModal } from '../ui/modals';
 
 const W = 920, H = 520;
@@ -30,6 +31,7 @@ export class FrontierScene extends Phaser.Scene {
   constructor() { super('Frontier'); }
 
   create(): void {
+    fitToScreen(this);
     audio.sfx('click');
     this.gameOver = false;
     this.paused = false;
@@ -62,34 +64,34 @@ export class FrontierScene extends Phaser.Scene {
     // Resource panel
     const resourcePanel = this.add.graphics();
     resourcePanel.fillStyle(0x1f2937, 1);
-    resourcePanel.fillRoundedRect(10, 10, 290, 90, 6);
+    resourcePanel.fillRoundedRect(10, 10, 290, 112, 6);
     resourcePanel.lineStyle(1, 0x22c55e, 0.3);
-    resourcePanel.strokeRoundedRect(10, 10, 290, 90, 6);
+    resourcePanel.strokeRoundedRect(10, 10, 290, 112, 6);
 
-    this.add.text(20, 20, 'RESOURCES', { fontFamily: 'monospace', fontSize: '10px', color: '#22c55e' });
+    this.add.text(20, 20, 'RESOURCES', { fontFamily: 'monospace', fontSize: '12px', color: '#22c55e' });
 
-    this.resourceText = this.add.text(30, 40, '', {
-      fontFamily: 'monospace', fontSize: '11px', color: '#ffd078', lineSpacing: 6,
+    this.resourceText = this.add.text(30, 42, '', {
+      fontFamily: 'monospace', fontSize: '13px', color: '#ffd078', lineSpacing: 6,
     });
     this.updateResourceDisplay();
 
     // Round info panel
     const roundPanel = this.add.graphics();
     roundPanel.fillStyle(0x1f2937, 1);
-    roundPanel.fillRoundedRect(W - 220, 10, 210, 90, 6);
+    roundPanel.fillRoundedRect(W - 250, 10, 240, 112, 6);
     roundPanel.lineStyle(1, 0xef4444, 0.3);
-    roundPanel.strokeRoundedRect(W - 220, 10, 210, 90, 6);
+    roundPanel.strokeRoundedRect(W - 250, 10, 240, 112, 6);
 
-    this.roundText = this.add.text(W - 200, 20, 'ROUND 1 / 3', {
-      fontFamily: 'monospace', fontSize: '12px', color: '#ffd078',
+    this.roundText = this.add.text(W - 232, 20, 'ROUND 1 / 3', {
+      fontFamily: 'monospace', fontSize: '14px', color: '#ffd078',
     });
 
-    this.countdownText = this.add.text(W - 200, 45, 'NEXT RAID: 30s', {
-      fontFamily: 'monospace', fontSize: '11px', color: '#ef4444',
+    this.countdownText = this.add.text(W - 232, 52, 'NEXT RAID: 30s', {
+      fontFamily: 'monospace', fontSize: '13px', color: '#ef4444',
     });
 
-    this.statusText = this.add.text(W - 200, 70, 'Workers: 6 / 12', {
-      fontFamily: 'monospace', fontSize: '10px', color: '#8b8d9a',
+    this.statusText = this.add.text(W - 232, 82, 'Workers: 6 / 12', {
+      fontFamily: 'monospace', fontSize: '12px', color: '#8b8d9a',
     });
 
     // Settlement visualization - grass/ground
@@ -103,7 +105,7 @@ export class FrontierScene extends Phaser.Scene {
 
     // Buildings area label
     this.add.text(W / 2, H / 2 - 60, 'SETTLEMENT', {
-      fontFamily: 'monospace', fontSize: '10px', color: '#22c55e',
+      fontFamily: 'monospace', fontSize: '12px', color: '#22c55e',
     }).setOrigin(0.5);
 
     this.renderBuildings();
@@ -118,7 +120,7 @@ export class FrontierScene extends Phaser.Scene {
       const res = ['wood', 'food', 'stone'][i] as keyof Workers;
 
       // Label
-      this.add.text(40, y, labels[i], { fontFamily: 'monospace', fontSize: '11px', color: '#c4d0e6' });
+      this.add.text(40, y, labels[i], { fontFamily: 'monospace', fontSize: '13px', color: '#c4d0e6' });
 
       // Minus button
       const minusBtn = this.add.text(130, y - 5, '−', {
@@ -128,7 +130,7 @@ export class FrontierScene extends Phaser.Scene {
       minusBtn.on('pointerdown', () => this.adjustWorker(res, -1));
 
       // Count
-      const countText = this.add.text(160, y, `${this.workers[res]}`, {
+      const countText = this.add.text(170, y, `${this.workers[res]}`, {
         fontFamily: 'monospace', fontSize: '14px', color: '#ffd078',
       });
 
@@ -147,7 +149,7 @@ export class FrontierScene extends Phaser.Scene {
   private buildActionButtons(): void {
     // Build Farm button
     const farmBtn = this.add.text(40, 360, 'BUILD FARM (5 wood)', {
-      fontFamily: 'monospace', fontSize: '11px', color: '#22c55e',
+      fontFamily: 'monospace', fontSize: '13px', color: '#22c55e',
       backgroundColor: '#1f2937', padding: { x: 10, y: 6 },
     }).setInteractive({ useHandCursor: true });
 
@@ -157,7 +159,7 @@ export class FrontierScene extends Phaser.Scene {
 
     // Build Palisade button
     const palisadeBtn = this.add.text(200, 360, 'BUILD PALISADE (8 stone)', {
-      fontFamily: 'monospace', fontSize: '11px', color: '#60a5fa',
+      fontFamily: 'monospace', fontSize: '13px', color: '#60a5fa',
       backgroundColor: '#1f2937', padding: { x: 10, y: 6 },
     }).setInteractive({ useHandCursor: true });
 
@@ -167,7 +169,7 @@ export class FrontierScene extends Phaser.Scene {
 
     // Recruit Worker button
     const recruitBtn = this.add.text(400, 360, 'RECRUIT WORKER (10 food)', {
-      fontFamily: 'monospace', fontSize: '11px', color: '#f6b94b',
+      fontFamily: 'monospace', fontSize: '13px', color: '#f6b94b',
       backgroundColor: '#1f2937', padding: { x: 10, y: 6 },
     }).setInteractive({ useHandCursor: true });
 
@@ -177,19 +179,26 @@ export class FrontierScene extends Phaser.Scene {
 
     // Speed up button (shows monetization mechanic)
     const speedBtn = this.add.text(600, 360, '⚡ SPEED UP RAID', {
-      fontFamily: 'monospace', fontSize: '11px', color: '#a87ffb',
+      fontFamily: 'monospace', fontSize: '13px', color: '#a87ffb',
       backgroundColor: '#1f2937', padding: { x: 10, y: 6 },
     }).setInteractive({ useHandCursor: true });
 
     speedBtn.on('pointerdown', () => {
       audio.sfx('click');
-      this.statusText.setText('Speed-up purchased! (simulated)');
+      this.statusText.setText('Speed-up bought (simulated)');
       this.time.delayedCall(2000, () => this.updateStatus());
     });
 
+    // Lay the action buttons out in a row so they never overlap
+    let bx = 40;
+    for (const b of [farmBtn, palisadeBtn, recruitBtn, speedBtn]) {
+      b.setX(bx);
+      bx += b.width + 14;
+    }
+
     // End Round button
     const endBtn = this.add.text(40, 400, 'END ROUND', {
-      fontFamily: 'monospace', fontSize: '12px', color: '#ffd078',
+      fontFamily: 'monospace', fontSize: '14px', color: '#ffd078',
       backgroundColor: '#374151', padding: { x: 14, y: 8 },
     }).setInteractive({ useHandCursor: true });
 
@@ -265,7 +274,7 @@ export class FrontierScene extends Phaser.Scene {
           gfx.fillRect(b.x - 20 + i * 15, b.y + 25, 10, 15);
         }
 
-        this.add.text(b.x, b.y - 5, '🌾', { fontSize: '12px' }).setOrigin(0.5);
+        this.add.text(b.x, b.y - 5, '🌾', { fontSize: '14px' }).setOrigin(0.5);
       } else {
         // Palisade wall
         gfx.fillStyle(0x5c4033, 1);
@@ -281,7 +290,7 @@ export class FrontierScene extends Phaser.Scene {
         gfx.fillTriangle(b.x + 9, b.y - 25, b.x + 13, b.y - 35, b.x + 17, b.y - 25);
         gfx.fillTriangle(b.x + 24, b.y - 20, b.x + 28, b.y - 30, b.x + 32, b.y - 20);
 
-        this.add.text(b.x, b.y - 10, '🛡️', { fontSize: '12px' }).setOrigin(0.5);
+        this.add.text(b.x, b.y - 10, '🛡️', { fontSize: '14px' }).setOrigin(0.5);
       }
     });
   }

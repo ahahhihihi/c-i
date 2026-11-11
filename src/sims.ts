@@ -4,10 +4,20 @@
  */
 import Phaser from 'phaser';
 
+/** All procedural textures are drawn at this multiple and displayed at 1/TEX_SCALE, so they stay sharp when zoomed. */
+export const TEX_SCALE = 3;
+
 export const SIM_W = 40;
 export const SIM_H = 64;
 /** Physics body for sims: small box at the feet. */
-export const SIM_BODY = { w: 16, h: 14, ox: 12, oy: 48 };
+export const SIM_BODY = { w: 16 * TEX_SCALE, h: 14 * TEX_SCALE, ox: 12 * TEX_SCALE, oy: 48 * TEX_SCALE };
+
+/** Physics sprite using the hi-res sim texture at its logical size, with a feet-sized body. */
+export function spawnSim(scene: Phaser.Scene, x: number, y: number, key = 'player'): Phaser.Physics.Arcade.Sprite {
+  const sp = scene.physics.add.sprite(x, y, key).setScale(1 / TEX_SCALE);
+  sp.body!.setSize(SIM_BODY.w, SIM_BODY.h).setOffset(SIM_BODY.ox, SIM_BODY.oy);
+  return sp;
+}
 
 export type HairStyle = 'short' | 'long' | 'bun' | 'curly';
 
@@ -27,7 +37,7 @@ function shade(color: number, amt: number): number {
 }
 
 export function makeSim(scene: Phaser.Scene, key: string, look: SimLook): void {
-  const g = scene.add.graphics();
+  const g = scene.add.graphics().setScale(TEX_SCALE);
   const cx = SIM_W / 2;
   const skinD = shade(look.skin, -28);
   const skinL = shade(look.skin, 14);
@@ -151,14 +161,14 @@ export function makeSim(scene: Phaser.Scene, key: string, look: SimLook): void {
   g.fillStyle(hairL, 0.9);
   g.fillEllipse(cx - 5, 3.5, 9, 3);
 
-  g.generateTexture(key, SIM_W, SIM_H);
+  g.generateTexture(key, SIM_W * TEX_SCALE, SIM_H * TEX_SCALE);
   g.destroy();
 }
 
 /** The green diamond that floats above every Sim. 16x28. */
 export function makePlumbob(scene: Phaser.Scene): void {
   if (scene.textures.exists('plumbob')) return;
-  const g = scene.add.graphics();
+  const g = scene.add.graphics().setScale(TEX_SCALE);
   const w = 16, h = 28, m = w / 2, mid = h / 2;
   g.fillStyle(0x2bbf3f, 1);
   g.fillTriangle(m, 0, w, mid, 0, mid);
@@ -170,14 +180,14 @@ export function makePlumbob(scene: Phaser.Scene): void {
   g.fillTriangle(m, h, m, mid, 0, mid);
   g.fillStyle(0xffffff, 0.55);
   g.fillTriangle(m - 1, 3, m - 3, mid - 2, m - 1, mid - 3);
-  g.generateTexture('plumbob', w, h);
+  g.generateTexture('plumbob', w * TEX_SCALE, h * TEX_SCALE);
   g.destroy();
 }
 
 /** Warm wood-plank floor tile, 64x64, tiles seamlessly. */
 export function makeWoodFloor(scene: Phaser.Scene): void {
   if (scene.textures.exists('floor_wood')) return;
-  const g = scene.add.graphics();
+  const g = scene.add.graphics().setScale(TEX_SCALE);
   const shades = [0xc89358, 0xbf8a50, 0xd09c62, 0xb98350];
   for (let i = 0; i < 4; i++) {
     const y = i * 16;
@@ -197,13 +207,13 @@ export function makeWoodFloor(scene: Phaser.Scene): void {
     g.fillStyle(0x6b4426, 0.6);
     g.fillRect(0, y + 15, 64, 1);
   }
-  g.generateTexture('floor_wood', 64, 64);
+  g.generateTexture('floor_wood', 64 * TEX_SCALE, 64 * TEX_SCALE);
   g.destroy();
 }
 
 export function makePlant(scene: Phaser.Scene): void {
   if (scene.textures.exists('plant')) return;
-  const g = scene.add.graphics();
+  const g = scene.add.graphics().setScale(TEX_SCALE);
   g.fillStyle(0x000000, 0.18);
   g.fillEllipse(20, 54, 28, 8);
   // pot
@@ -222,6 +232,6 @@ export function makePlant(scene: Phaser.Scene): void {
     g.fillStyle(0x56c46a, 0.7);
     g.fillEllipse(x - 2, y - 3, rx, ry);
   }
-  g.generateTexture('plant', 40, 58);
+  g.generateTexture('plant', 40 * TEX_SCALE, 58 * TEX_SCALE);
   g.destroy();
 }

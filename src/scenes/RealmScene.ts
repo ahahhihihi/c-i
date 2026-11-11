@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { ensureTextures } from '../assets';
 import { audio } from '../audio';
-import { SIM_BODY } from '../sims';
+import { fitToScreen } from '../view';
+import { spawnSim } from '../sims';
 import { showModal, closeModal } from '../ui/modals';
 
 const W = 920, H = 520;
@@ -34,6 +35,7 @@ export class RealmScene extends Phaser.Scene {
   constructor() { super('Realm'); }
 
   create(): void {
+    fitToScreen(this);
     ensureTextures(this);
     audio.sfx('click');
     this.over = false;
@@ -64,7 +66,7 @@ export class RealmScene extends Phaser.Scene {
         // Occasional rune marks
         if (Math.random() > 0.85) {
           this.add.text(x + 30, y + 30, ['✦', '✧', '◈', '◇'][Math.floor(Math.random() * 4)], {
-            fontFamily: 'monospace', fontSize: '12px', color: '#a87ffb',
+            fontFamily: 'monospace', fontSize: '14px', color: '#a87ffb',
           }).setOrigin(0.5).setAlpha(0.2);
         }
       }
@@ -100,13 +102,12 @@ export class RealmScene extends Phaser.Scene {
 
     this.add.rectangle(100, H - 60, 80, 40, 0x1f1525);
     this.add.rectangle(100, H - 60, 80, 40, 0xa87ffb, 0.1);
-    this.add.text(100, H - 60, 'ELDER\nCHEN', { fontFamily: 'monospace', fontSize: '8px', color: '#a87ffb', align: 'center' }).setOrigin(0.5);
+    this.add.text(100, H - 60, 'ELDER\nCHEN', { fontFamily: 'monospace', fontSize: '11px', color: '#a87ffb', align: 'center' }).setOrigin(0.5);
   }
 
   private buildPlayer(): void {
-    this.player = this.physics.add.sprite(100, H - 120, 'player');
+    this.player = spawnSim(this, 100, H - 120);
     this.player.setCollideWorldBounds(true);
-    this.player.body!.setSize(SIM_BODY.w, SIM_BODY.h).setOffset(SIM_BODY.ox, SIM_BODY.oy);
     this.player.setDepth(10);
 
     // Player shadow
@@ -174,16 +175,16 @@ export class RealmScene extends Phaser.Scene {
   }
 
   private buildHud(): void {
-    this.add.text(20, 20, 'LOST REALM', { fontFamily: 'monospace', fontSize: '12px', color: '#a87ffb' });
+    this.add.text(20, 20, 'LOST REALM', { fontFamily: 'monospace', fontSize: '14px', color: '#a87ffb' });
 
-    this.shardText = this.add.text(20, 40, 'SHARDS: 0 / 3', { fontFamily: 'monospace', fontSize: '11px', color: '#ffd078' });
+    this.shardText = this.add.text(20, 40, 'SHARDS: 0 / 3', { fontFamily: 'monospace', fontSize: '13px', color: '#ffd078' });
 
     // Stamina bar
     this.staminaBar = this.add.graphics();
     this.updateStaminaBar();
 
     this.add.text(W - 20, 20, 'WASD · SPACE attack · E interact', {
-      fontFamily: 'monospace', fontSize: '9px', color: '#8b8d9a',
+      fontFamily: 'monospace', fontSize: '11px', color: '#8b8d9a',
     }).setOrigin(1, 0);
 
     this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC)

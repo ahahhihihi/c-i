@@ -2,7 +2,7 @@
  * Improved procedural sprite generation - Sims-style characters, arcade cabinets
  */
 import Phaser from 'phaser';
-import { makeSim, makePlumbob, makeWoodFloor, makePlant, type SimLook } from './sims';
+import { TEX_SCALE, makeSim, makePlumbob, makeWoodFloor, makePlant, type SimLook } from './sims';
 
 export function ensureTextures(scene: Phaser.Scene): void {
   // Sims-style characters
@@ -38,7 +38,7 @@ export function ensureTextures(scene: Phaser.Scene): void {
 }
 
 function makeCabinet(scene: Phaser.Scene, key: string, primary: number, secondary: number, accent: number): void {
-  const g = scene.add.graphics();
+  const g = scene.add.graphics().setScale(TEX_SCALE);
   const w = 90, h = 120;
 
   // Cabinet body - side panels
@@ -128,12 +128,12 @@ function makeCabinet(scene: Phaser.Scene, key: string, primary: number, secondar
   g.fillRect(5, h - 3, 15, 3);
   g.fillRect(w - 20, h - 3, 15, 3);
 
-  g.generateTexture(key, w, h);
+  g.generateTexture(key, w * TEX_SCALE, h * TEX_SCALE);
   g.destroy();
 }
 
 function makeExhibit(scene: Phaser.Scene): void {
-  const g = scene.add.graphics();
+  const g = scene.add.graphics().setScale(TEX_SCALE);
   const w = 100, h = 80;
 
   // Shadow
@@ -171,12 +171,12 @@ function makeExhibit(scene: Phaser.Scene): void {
   g.fillRect(10, 3, 8, 6);
   g.fillRect(w - 18, 3, 8, 6);
 
-  g.generateTexture('exhibit', w, h);
+  g.generateTexture('exhibit', w * TEX_SCALE, h * TEX_SCALE);
   g.destroy();
 }
 
 function makeFloorTile(scene: Phaser.Scene): void {
-  const g = scene.add.graphics();
+  const g = scene.add.graphics().setScale(TEX_SCALE);
   const w = 64, h = 64;
 
   // Base tile

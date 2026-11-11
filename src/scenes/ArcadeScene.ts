@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { ensureTextures } from '../assets';
 import { audio } from '../audio';
-import { SIM_BODY } from '../sims';
+import { fitToScreen } from '../view';
+import { TEX_SCALE, spawnSim } from '../sims';
 import { showModal, closeModal, showDialogue, showExhibit, showGameIntro } from '../ui/modals';
 import { NPCS, EXHIBITS, MACHINES } from '../data/dialogues';
 
@@ -26,6 +27,7 @@ export class ArcadeScene extends Phaser.Scene {
   constructor() { super('Arcade'); }
 
   create(): void {
+    fitToScreen(this);
     ensureTextures(this);
     audio.sfx('click');
 
@@ -44,7 +46,7 @@ export class ArcadeScene extends Phaser.Scene {
 
   private buildEnvironment(): void {
     // Wood floor
-    this.add.tileSprite(W / 2, 80 + (H - 80) / 2, W, H - 80, 'floor_wood').setDepth(0);
+    this.add.tileSprite(W / 2, 80 + (H - 80) / 2, W, H - 80, 'floor_wood').setTileScale(1 / TEX_SCALE).setDepth(0);
 
     // Warm light pooling from the windows, darker toward the edges
     const light = this.add.graphics().setDepth(1);
@@ -121,16 +123,16 @@ export class ArcadeScene extends Phaser.Scene {
     wall.fillRoundedRect(W / 2 - 128, 8, 252, 40, 8);
     wall.lineStyle(2, 0xe9c46a, 1);
     wall.strokeRoundedRect(W / 2 - 124, 12, 244, 32, 6);
-    this.add.text(W / 2, 22, 'MAIN ARCADE FLOOR', {
-      fontFamily: 'monospace', fontSize: '15px', color: '#ffe9a8', fontStyle: 'bold',
+    this.add.text(W / 2, 21, 'MAIN ARCADE FLOOR', {
+      fontFamily: 'monospace', fontSize: '18px', color: '#ffe9a8', fontStyle: 'bold',
     }).setOrigin(0.5).setDepth(4);
     this.add.text(W / 2, 38, 'WALK · INTERACT · PLAY', {
-      fontFamily: 'monospace', fontSize: '9px', color: '#d9c08a',
+      fontFamily: 'monospace', fontSize: '11px', color: '#d9c08a',
     }).setOrigin(0.5).setDepth(4);
 
     // Houseplants in the corners
     for (const [px, py] of [[34, 112], [W - 34, 112], [34, H - 44], [W - 34, H - 44]] as const) {
-      this.add.image(px, py, 'plant').setDepth(py);
+      this.add.image(px, py, 'plant').setScale(1 / TEX_SCALE).setDepth(py);
     }
 
     // Floating dust motes in the window light
@@ -146,10 +148,10 @@ export class ArcadeScene extends Phaser.Scene {
 
   /** Green plumbob that bobs and spins above a character. */
   private addPlumbob(x: number, y: number, tint?: number, bob = true): Phaser.GameObjects.Image {
-    const pb = this.add.image(x, y, 'plumbob').setDepth(300);
+    const pb = this.add.image(x, y, 'plumbob').setScale(1 / TEX_SCALE).setDepth(300);
     if (tint !== undefined) pb.setTint(tint);
     if (bob) this.tweens.add({ targets: pb, y: y - 5, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
-    this.tweens.add({ targets: pb, scaleX: 0.25, duration: 1100, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+    this.tweens.add({ targets: pb, scaleX: 0.25 / TEX_SCALE, duration: 1100, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
     return pb;
   }
 
@@ -169,7 +171,7 @@ export class ArcadeScene extends Phaser.Scene {
     this.moodBars = this.add.graphics().setDepth(201);
     rows.forEach((r, i) => {
       this.add.text(x + 10, y + 8 + i * 18, r.label, {
-        fontFamily: 'monospace', fontSize: '9px', color: '#d6ecff',
+        fontFamily: 'monospace', fontSize: '11px', color: '#d6ecff',
       }).setDepth(201);
     });
     this.moodRows = rows;
@@ -196,7 +198,7 @@ export class ArcadeScene extends Phaser.Scene {
     for (const m of MACHINES) {
       // Cabinet sprite
       const cabinet = this.add.image(m.x, m.y, `cabinet_${m.id}`);
-      cabinet.setScale(0.95).setDepth(10);
+      cabinet.setScale(0.95 / TEX_SCALE).setDepth(10);
 
       // Glow under cabinet
       const glow = this.add.graphics();
@@ -205,10 +207,10 @@ export class ArcadeScene extends Phaser.Scene {
       this.tweens.add({ targets: glow, alpha: 0.18, duration: 1800, yoyo: true, repeat: -1 });
 
       // Floating label
-      const labelBg = this.add.rectangle(m.x, m.y + 75, 100, 20, 0x0a0e19, 0.85);
+      const labelBg = this.add.rectangle(m.x, m.y + 75, 130, 24, 0x0a0e19, 0.85);
       labelBg.setStrokeStyle(1, m.color, 0.6);
       this.add.text(m.x, m.y + 75, m.label.toUpperCase(), {
-        fontFamily: 'monospace', fontSize: '9px', color: '#ffd078', letterSpacing: 1,
+        fontFamily: 'monospace', fontSize: '11px', color: '#ffd078', letterSpacing: 1,
       }).setOrigin(0.5);
 
       // Hit area
@@ -232,7 +234,7 @@ export class ArcadeScene extends Phaser.Scene {
 
   private buildExhibits(): void {
     for (const ex of EXHIBITS) {
-      const board = this.add.image(ex.x, ex.y, 'exhibit').setScale(0.9).setDepth(5);
+      const board = this.add.image(ex.x, ex.y, 'exhibit').setScale(0.9 / TEX_SCALE).setDepth(5);
 
       // Glow
       const glow = this.add.graphics();
@@ -242,7 +244,7 @@ export class ArcadeScene extends Phaser.Scene {
 
       // Label
       this.add.text(ex.x, ex.y + 50, 'EXHIBIT', {
-        fontFamily: 'monospace', fontSize: '8px', color: '#8b8d9a',
+        fontFamily: 'monospace', fontSize: '11px', color: '#8b8d9a',
       }).setOrigin(0.5);
 
       // Hit area
@@ -266,25 +268,25 @@ export class ArcadeScene extends Phaser.Scene {
       const npc = NPCS[i];
       const portrait = portraits[i];
 
-      const sprite = this.add.image(npc.x, npc.y, `npc_${portrait}`).setDepth(20);
+      const sprite = this.add.image(npc.x, npc.y, `npc_${portrait}`).setScale(1 / TEX_SCALE).setDepth(20);
 
       // Shadow
       this.add.ellipse(npc.x, npc.y + 28, 28, 10, 0x000000, 0.25).setDepth(19);
       this.addPlumbob(npc.x, npc.y - 58, 0x9be7a8);
 
       // Name label with background
-      const nameBg = this.add.rectangle(npc.x, npc.y - 44, 90, 16, 0x16324f, 0.9).setDepth(20);
+      const nameBg = this.add.rectangle(npc.x, npc.y - 44, 124, 20, 0x16324f, 0.9).setDepth(20);
       nameBg.setStrokeStyle(1, 0xbfe3ff, 0.8);
       this.add.text(npc.x, npc.y - 44, npc.name, {
-        fontFamily: 'monospace', fontSize: '9px', color: '#ffffff',
+        fontFamily: 'monospace', fontSize: '11px', color: '#ffffff',
       }).setOrigin(0.5).setDepth(21);
 
       // Idle animation - gentle breathing
       this.tweens.add({
         targets: sprite,
         y: npc.y - 2,
-        scaleX: 0.97,
-        scaleY: 1.01,
+        scaleX: 0.97 / TEX_SCALE,
+        scaleY: 1.01 / TEX_SCALE,
         duration: 2000,
         yoyo: true,
         repeat: -1,
@@ -312,9 +314,8 @@ export class ArcadeScene extends Phaser.Scene {
 
   private buildPlayer(): void {
     // Spawn point
-    this.player = this.physics.add.sprite(460, 450, 'player');
+    this.player = spawnSim(this, 460, 450);
     this.player.setCollideWorldBounds(true);
-    this.player.body!.setSize(SIM_BODY.w, SIM_BODY.h).setOffset(SIM_BODY.ox, SIM_BODY.oy);
     this.player.setDepth(100);
 
     // Player shadow
@@ -328,15 +329,15 @@ export class ArcadeScene extends Phaser.Scene {
 
     // Click to move on floor
     this.input.on('pointerdown', (ptr: Phaser.Input.Pointer) => {
-      if (ptr.y > 90 && ptr.y < H - 10) {
+      if (ptr.worldY > 90 && ptr.worldY < H - 10) {
         // Check if clicking an interactable
         const clickedInteractable = this.interactables.some(i => {
-          const dist = Phaser.Math.Distance.Between(ptr.x, ptr.y, i.x, i.y);
+          const dist = Phaser.Math.Distance.Between(ptr.worldX, ptr.worldY, i.x, i.y);
           return dist < 50;
         });
 
         if (!clickedInteractable) {
-          this.targetPos = { x: ptr.x, y: ptr.y };
+          this.targetPos = { x: ptr.worldX, y: ptr.worldY };
           this.physics.moveToObject(this.player, this.targetPos, 200);
         }
       }
@@ -364,7 +365,7 @@ export class ArcadeScene extends Phaser.Scene {
   private buildHud(): void {
     // Mute button
     const muteBtn = this.add.text(W - 15, 15, audio.isMuted() ? '🔇 SOUND OFF' : '🔊 SOUND ON', {
-      fontFamily: 'monospace', fontSize: '9px', color: '#8b8d9a',
+      fontFamily: 'monospace', fontSize: '11px', color: '#8b8d9a',
       backgroundColor: '#0a0f1988', padding: { x: 6, y: 3 },
     }).setOrigin(1, 0).setInteractive({ useHandCursor: true }).setDepth(200);
 

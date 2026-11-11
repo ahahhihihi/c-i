@@ -199,3 +199,16 @@ body {
   .dialogue-questions { border-right: none; border-bottom: 1px solid var(--border); }
   .stat-row { grid-template-columns: 1fr; }
 }
+
+.voice-toggle {
+  margin-top: 10px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 11px;
+  color: #c4d0e6;
+  background: transparent;
+  border: 1px solid #2b3550;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.voice-toggle:hover { color: #ffd078; border-color: #ffd078; }

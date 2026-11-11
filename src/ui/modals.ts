@@ -1,3 +1,4 @@
+import { speech } from '../speech';
 /**
  * Simple modal system - all game modals use this
  */
@@ -57,6 +58,7 @@ export function showModal(opts: ModalOptions): void {
 }
 
 export function closeModal(): void {
+  speech.stop();
   if (current && current.parentNode) {
     current.parentNode.removeChild(current);
   }
@@ -95,6 +97,7 @@ export function showDialogue(opts: {
       <div class="dialogue-response">
         <div class="dialogue-section-title">RESPONSE</div>
         <p class="response-prompt" id="response-text">Select a question above.</p>
+        ${speech.supported() ? `<button class="voice-toggle" id="voice-toggle" type="button"></button>` : ''}
         <div class="code-tags" id="response-codes"></div>
       </div>
     </div>
@@ -109,6 +112,15 @@ export function showDialogue(opts: {
       const btns = el.querySelectorAll('.question-btn');
       const responseText = el.querySelector('#response-text') as HTMLElement;
       const responseCodes = el.querySelector('#response-codes') as HTMLElement;
+      const voiceBtn = el.querySelector('#voice-toggle') as HTMLButtonElement | null;
+      let lastAnswer = '';
+      const paintVoice = () => { if (voiceBtn) voiceBtn.textContent = speech.enabled() ? '🔊 Voice on' : '🔇 Voice off'; };
+      paintVoice();
+      voiceBtn?.addEventListener('click', () => {
+        speech.setEnabled(!speech.enabled());
+        paintVoice();
+        if (speech.enabled() && lastAnswer) speech.speak(lastAnswer, opts.name);
+      });
 
       btns.forEach((btn) => {
         btn.addEventListener('click', () => {
@@ -120,6 +132,8 @@ export function showDialogue(opts: {
 
           responseText.className = 'response-text';
           responseText.textContent = `"${item.a}"`;
+          lastAnswer = item.a;
+          speech.speak(item.a, opts.name);
 
           if (item.codes?.length) {
             responseCodes.innerHTML = item.codes.map(c => `<span class="code-tag">${c}</span>`).join('');

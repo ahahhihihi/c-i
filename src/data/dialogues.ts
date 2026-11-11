@@ -31,17 +31,17 @@ export const NPCS: NPCData[] = [
     questions: [
       {
         q: 'What makes the hardware here special?',
-        a: "You sit before an authentic candy cabinet running Street Fighter III: 3rd Strike on genuine Sanwa parts. You cannot replicate that input timing or microswitch feedback on an emulator. The defensible moat of arcades is no longer compute—it's physical human-interface hardware.",
+        a: "This is a real candy cabinet running Street Fighter III: 3rd Strike, with genuine Sanwa parts. You can't get that input timing or that microswitch click from an emulator. These days an arcade's edge isn't computing power. It's the physical hardware in your hands.",
         codes: ['COMP: Competitive Mastery', 'PLAT: Platform Specificity'],
       },
       {
         q: 'How much do you typically spend?',
-        a: "RMB 50-60. If I hold the cabinet on a win streak, one token lasts twenty minutes because winner-stays-on. We don't make small talk—you place your coin on the monitor glass to establish challenge priority.",
+        a: "About 50 to 60 yuan. If I'm on a win streak, a single token can last twenty minutes, because the winner stays on. Nobody makes small talk here. You just put your coin on the monitor glass to claim the next game.",
         codes: ['VALU: Perceived Utility', 'SPND: Direct Capital Outlay'],
       },
       {
         q: 'What about mobile games?',
-        a: "Mobile titles like Honor of Kings are cognitive fast food—login streaks and cosmetic gacha. Here, executing a multi-hit hit-confirm belongs exclusively to your nervous system. You cannot purchase a competitive advantage.",
+        a: "Mobile games like Honor of Kings feel like fast food to me. It's login streaks and cosmetic gacha. Here, landing a multi-hit combo is all you, your hands and your nerves. You can't buy an advantage.",
         codes: ['MONA: Monetization Literacy'],
       },
     ],
@@ -55,17 +55,17 @@ export const NPCS: NPCData[] = [
     questions: [
       {
         q: 'How do the claw machines work?',
-        a: "We spent RMB 100 chasing a Sanrio plush that retails for RMB 15 on Taobao. You're not buying a textile object—you're buying the ten-second tension cycle where the crane hoists the prize, trembles, and threatens to slip. That emotional release is worth the RMB 100.",
+        a: "We spent 100 yuan chasing a Sanrio plush that sells for 15 yuan on Taobao. But we weren't really buying a toy. We were buying those ten seconds, when the claw lifts the prize, it wobbles, and it almost slips. That rush was worth the 100 yuan.",
         codes: ['VALU: Emotional Utility', 'MONA: Near-Miss Design'],
       },
       {
         q: 'How do you pay?',
-        a: "Each claw has an integrated QR code. You scan WeChat Pay on the glass, authorize RMB 6 for two attempts. You never confront the psychological weight of spending physical banknotes. It's frictionless.",
+        a: "Every machine has a QR code on it. You scan it with WeChat Pay, and 6 yuan gets you two tries. You never have to hand over real cash, so it doesn't feel like spending. It's super easy.",
         codes: ['FRIC: Reduced Friction'],
       },
       {
         q: 'Why not play the fighting cabinets?',
-        a: "Traditional fighting cabinets look intimidating—men slamming controls at extreme speed with no tutorials. Claw machines require zero cognitive onboarding. That's why spend is higher here.",
+        a: "The fighting cabinets look scary. People are hammering the buttons at crazy speed, and there's no tutorial. A claw machine needs no explanation at all, so people spend more there.",
         codes: ['ONBD: Onboarding Friction'],
       },
     ],
@@ -79,12 +79,12 @@ export const NPCS: NPCData[] = [
     questions: [
       {
         q: 'How does the dual-currency work?',
-        a: "Tokens burn fast on 3-minute simulators. Marbles are temporal stretching—you pour 200 steel balls into a hopper and that RMB 20 purchase occupies my son for 45 uninterrupted minutes. He experiences the illusion of earned labor.",
+        a: "Tokens go fast on the three-minute simulators. Marbles last much longer. I put 200 steel balls in the hopper for 20 yuan, and my son stays busy for 45 minutes straight. He feels like he's earning every one of them.",
         codes: ['VALU: Temporal Duration', 'SPND: Capital Velocity'],
       },
       {
         q: 'Why prefer arcades over mobile games?',
-        a: "I forbid digital gacha at home—in-app purchases are an invisible drain. Here, RMB 67 is bounded. He runs around, practices coordination, hoards paper tickets for an eraser worth two yuan. It's controlled, tangible.",
+        a: "I don't allow gacha games at home, because in-app purchases quietly drain your money. Here, the 67 yuan I spend has a limit. He runs around, works on his coordination, and saves paper tickets for an eraser worth two yuan. It feels controlled, and it's real.",
         codes: ['SOCI: Intergenerational Bonding'],
       },
     ],
@@ -98,12 +98,12 @@ export const NPCS: NPCData[] = [
     questions: [
       {
         q: 'How much do you spend on games?',
-        a: "RMB 15,000-30,000 monthly; top alliance members hit RMB 100,000 during castle battles. We lack fine motor dexterity for MOBAs. What we possess is disposable capital. In an SLG, capital translates directly into march speed, troop tiers, and territory.",
+        a: "Between 15,000 and 30,000 yuan a month. During castle battles, the top alliance members can spend 100,000. I don't have the hand speed for MOBAs. What I do have is money to spend. In a strategy game, money turns straight into faster marches, stronger troops, and more territory.",
         codes: ['SPND: Whale Monetization', 'COMP: Capitalized Mastery'],
       },
       {
         q: 'How does the alliance system work?',
-        a: "When I buy an RMB 648 pack, all 200 alliance members get a chest. Free-to-play players supply garrison numbers and scouting; paying leaders provide nuclear deterrent power and economic subsidies. It's executive management on a phone.",
+        a: "When I buy a 648 yuan pack, all 200 alliance members get a chest. The free players bring the numbers for garrisons and scouting. The paying leaders bring the firepower and keep the economy going. It's like running a company from your phone.",
         codes: ['SOCI: Alliance Hierarchy'],
       },
     ],
@@ -117,17 +117,17 @@ export const NPCS: NPCData[] = [
     questions: [
       {
         q: 'Why is Honor of Kings so dominant?',
-        a: "When you meet someone new, you exchange WeChat and someone asks: 'What rank are you in Kings? Let's 5-stack.' It transcends social strata. As long as Tencent controls the WeChat graph, this game cannot be displaced.",
+        a: "When you meet someone new, you swap WeChat, and sooner or later someone asks, 'What's your rank in Kings? Let's play five-stack.' It cuts across every social group. As long as Tencent owns the WeChat network, nothing is going to replace this game.",
         codes: ['SOCI: Social Embeddedness', 'COMM: Platform Infrastructure'],
       },
       {
         q: 'Do skins give advantage?',
-        a: "Skins offer nominal bonuses (+10 attack), but elite skins alter animation-cancel responsiveness. Han Xin's Street Haunter feels lighter and reacts frames faster than default. It's mechanical edge disguised as cosmetics.",
+        a: "On paper, skins give a small bonus, like plus 10 attack. But the top skins also change how fast your animations cancel. Han Xin's Street Haunter feels lighter and reacts a few frames faster than the default. It's a gameplay edge disguised as a cosmetic.",
         codes: ['SPND: Cosmetic Monetization', 'COMP: Mechanical Edge'],
       },
       {
         q: 'What keeps you playing?',
-        a: "The ranking algorithm tethers win-rate near 50%. A string of defeats induces ladder anxiety—you refuse to end your evening on a star deduction. You're logged in until 2 AM trying to recover rank.",
+        a: "The matchmaking keeps your win rate close to 50 percent. After a few losses you get ladder anxiety, and you don't want to end the night on a lost star. So you're still logged in at 2 AM, trying to win your rank back.",
         codes: ['RETN: Retention Hooks'],
       },
     ],
@@ -141,17 +141,17 @@ export const NPCS: NPCData[] = [
     questions: [
       {
         q: 'What draws you to Genshin Impact?',
-        a: "Genshin is an aesthetic sanctuary. I pull on banners based on narrative devotion—Chú lì. HoYoverse spends six weeks developing a character's musical leitmotif and emotional arc. By the time the banner drops, I'm committed regardless of meta viability.",
+        a: "Genshin feels like a place I go to relax and enjoy beautiful things. I pull on a banner because I love the character's story. HoYoverse spends six weeks on a character's theme music and emotional arc. By the time the banner opens, I'm already in, whether or not they're strong in the meta.",
         codes: ['ATTA: Narrative Attachment'],
       },
       {
         q: 'What about Fantasy Westward Journey?',
-        a: "FWJ operates as a financial commodity market. When I acquire high-tier equipment on NetEase's marketplace for RMB 8,000, I'm not consuming—I'm parking capital. Two years later, I can liquidate back onto the exchange.",
+        a: "Fantasy Westward Journey works more like a financial market. When I buy top gear on NetEase's marketplace for 8,000 yuan, I'm not spending it. I'm parking my money. Two years later, I can sell it back on the exchange.",
         codes: ['VALU: Capital Preservation', 'COMM: Asset Trading'],
       },
       {
         q: 'How do arcades compare?',
-        a: "Physical arcades offer zero emotional continuity. When credits drop to zero, the machine resets. I require persistent worlds where narrative progression and digital assets accumulate over years.",
+        a: "Arcades don't give you anything that lasts. When your credits hit zero, the machine just resets. I want a persistent world, where my story and my items build up over years.",
         codes: ['PROG: Progression Persistence'],
       },
     ],
@@ -165,17 +165,17 @@ export const NPCS: NPCData[] = [
     questions: [
       {
         q: 'What about traditional video cabinets?',
-        a: "Traditional cabinets generate low revenue per square meter—a master player occupies Street Fighter for an hour on three tokens. We retain them as environmental dressing for authentic arcade aura.",
+        a: "Traditional cabinets earn very little per square meter. A strong player can stay on Street Fighter for an hour on three tokens. We keep them mostly for atmosphere, so the place still feels like a real arcade.",
         codes: ['VALU: Revenue Density'],
       },
       {
         q: 'How do claw machines really work?',
-        a: "Claw machines run on payout parameters. The technician sets the ratio—say 1-in-18 attempts. The claw lifts with full grip, then cuts voltage 50% at the top, dropping the toy. Only when the threshold is satisfied does it hold to the chute.",
+        a: "Claw machines run on payout settings. The technician sets a ratio, say one win in 18 tries. The claw lifts with a full grip, then the power drops by half at the top, so the toy falls. It only holds all the way to the chute once the count is reached.",
         codes: ['MONA: Algorithmic Rigging'],
       },
       {
         q: 'Has digital payment changed things?',
-        a: "Mini-Program scanning reduced theft and labor. But you sacrifice acoustic marketing. The sound of fifty brass tokens clattering into a metal tray turns every head on the floor. It's irreproducible sensory advertising.",
+        a: "Scanning with the mini-program cut theft and saved on staff. But we lost the sound. Fifty brass tokens clattering into a metal tray makes everyone on the floor look over. You can't copy that kind of advertising.",
         codes: ['SOCI: Sensory Social Proof'],
       },
     ],
@@ -189,17 +189,17 @@ export const NPCS: NPCData[] = [
     questions: [
       {
         q: 'What is the biggest challenge for indies?',
-        a: "Securing an NPPA publishing license (ISBN). Review pipelines require exhaustive checks. For a five-person team with twelve months runway, waiting eighteen months for a license cycle is existentially fatal.",
+        a: "Getting a publishing license from the NPPA, the ISBN. The review process is exhaustive. For a team of five with twelve months of funding, waiting eighteen months for a license can end the studio.",
         codes: ['FRIC: Regulatory Obstacles'],
       },
       {
         q: 'How do developers survive without licenses?',
-        a: "Chinese indie developers rely on Steam Global as an offshore lifeline. Steam operates internationally without requiring a localized ISBN. Over 75% of our audience is domestic, but revenue clears through international rails.",
+        a: "Chinese indie developers rely on Steam Global to survive. It works internationally and doesn't need a local ISBN. More than 75 percent of our players are in China, but the money still arrives through international channels.",
         codes: ['COMM: External Infrastructure'],
       },
       {
         q: 'How is AI changing development?',
-        a: "We deploy AI for rapid pre-production concept art and script translation, reducing timelines 40%. But AI cannot balance a combat loop. Venture capital has abandoned non-live-service indie games.",
+        a: "We use AI for quick concept art and script translation, which cuts our timelines by about 40 percent. But AI can't balance a combat loop. And investors have walked away from indie games that aren't live-service.",
         codes: ['PLAT: Production Constraints'],
       },
     ],
@@ -302,7 +302,7 @@ export const EXHIBITS: ExhibitData[] = [
         content: `
           <h4>MOBA Archetype</h4>
           <p><strong>Grounded in:</strong> P-01 (hardware mastery) and P-05 (animation-cancel mechanics)</p>
-          <p><strong>Translation:</strong> Single-lane turret push distills competitive loop. J (special) cancels basic attack recovery frames—skill-based mechanical edge. Turret aggro redirects when attacking enemy hero in range.</p>
+          <p><strong>Translation:</strong> Single-lane turret push distills competitive loop. J (special) cancels basic attack recovery frames, which gives a skill-based mechanical edge. Turret aggro redirects when attacking enemy hero in range.</p>
         `,
       },
       {

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b0e16" />
+  <title>Three Spaces, One Arcade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">▮▮</span>
+        <span>THREE SPACES, ONE ARCADE</span>
+        <span class="brand-sub">/ FIELDWORK DOSSIER</span>
+      </div>
+      <div class="top-meta">
+        <span class="live-dot"></span>
+        <span class="floor-status">SHANGHAI</span>
+      </div>
+    </header>
+
+    <main class="game-shell">
+      <div class="game-heading">
+        <div>
+          <span class="section-kicker">INTERACTIVE ARCADE</span>
+          <h2>Walk the Floor</h2>
+        </div>
+        <div class="floor-status" id="location">MAIN FLOOR</div>
+      </div>
+
+      <div id="game-frame">
+        <div id="game"></div>
+        <div class="game-overlay" id="hint">WASD / CLICK to move · E to interact</div>
+        <div class="game-overlay location" id="controls">WASD · E · ESC</div>
+      </div>
+    </main>
+  </div>
+
+  <div id="modal-root"></div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

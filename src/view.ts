@@ -50,6 +50,18 @@ export function installUiZoom(): void {
   window.addEventListener('resize', apply);
 }
 
+/** Bottom-centre hint pill. Accepts simple HTML, e.g. '<kbd>E</kbd> Talk'. Empty string hides it. */
+export function setHint(html: string): void {
+  const el = document.getElementById('hint');
+  if (el && el.innerHTML !== html) el.innerHTML = html;
+}
+
+/** Top-right location label, e.g. 'WING A · SKILL'. */
+export function setLocation(text: string): void {
+  const el = document.getElementById('location');
+  if (el && el.textContent !== text) el.textContent = text;
+}
+
 export function toggleFullscreen(): void {
   if (document.fullscreenElement) void document.exitFullscreen();
   else void document.documentElement.requestFullscreen?.();

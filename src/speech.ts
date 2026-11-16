@@ -23,8 +23,8 @@ export const speech = {
     if (this.supported()) window.speechSynthesis.cancel();
   },
 
-  speak(text: string, speaker: string): void {
-    if (!this.enabled()) return;
+  speak(text: string, speaker: string, cb: { onEnd?: () => void } = {}): void {
+    if (!this.enabled()) { cb.onEnd?.(); return; }
     const synth = window.speechSynthesis;
     synth.cancel();
 
@@ -37,6 +37,7 @@ export const speech = {
     if (voices.length) u.voice = voices[h % voices.length];
     u.pitch = 0.85 + (h % 5) * 0.1;
     u.rate = 0.98;
+    if (cb.onEnd) { u.onend = () => cb.onEnd!(); u.onerror = () => cb.onEnd!(); }
     synth.speak(u);
   },
 };
